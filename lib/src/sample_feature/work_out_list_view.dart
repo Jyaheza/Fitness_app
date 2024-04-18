@@ -1,4 +1,8 @@
-import 'package:final_project/src/sample_feature/meal_suggestion.dart';
+import 'package:final_project/src/sample_feature/arms_page.dart';
+import 'package:final_project/src/sample_feature/back_page.dart';
+import 'package:final_project/src/sample_feature/chest_page.dart';
+import 'package:final_project/src/sample_feature/legs_workout.dart';
+import 'package:final_project/src/sample_feature/shoulders_page.dart';
 import 'package:flutter/material.dart';
 import 'openai_service.dart';
 import '../settings/settings_view.dart';
@@ -35,24 +39,31 @@ class WorkoutListView extends StatelessWidget {
         itemBuilder: (BuildContext context, int index) {
           final workout = workoutData[index];
           return InkWell(
-            onTap: () async {
-              // Pass workout name to OpenAIService
-              String? suggestedMeal =
-                  await openAIService.suggestMeal(workout['name']);
-              if (suggestedMeal != null) {
+            onTap: () {
+              if (workout['name'] == 'Shoulders') {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        MealSuggestionsPage(workoutName: workout['name']),
-                  ),
+                  MaterialPageRoute(builder: (context) => ShouldersPage()),
                 );
-              } else {
-                // Handle error or show a message
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                      content: Text(
-                          'Failed to suggest a meal for ${workout['name']}')),
+              } else if (workout['name'] == 'Arms') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ArmsPage()),
+                );
+              } else if (workout['name'] == 'Back') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => BackPage()),
+                );
+              } else if (workout['name'] == 'Chest') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ChestPage()),
+                );
+              } else if (workout['name'] == 'Legs') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LegsPage()),
                 );
               }
             },
@@ -71,7 +82,7 @@ class WorkoutListView extends StatelessWidget {
                   child: Center(
                     child: Text(
                       workout['name'],
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -80,30 +91,46 @@ class WorkoutListView extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  bottom: 10,
-                  right: 10,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      // Pass workout name to OpenAIService
-                      String? suggestedMeal =
-                          await openAIService.suggestMeal(workout['name']);
-                      if (suggestedMeal != null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text('Suggested meal: $suggestedMeal')),
-                        );
-                      } else {
-                        // Handle error or show a message
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                    bottom: 10,
+                    right: 10,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        String selectedWorkOut = workout['name'];
+                        String? suggestedMeal =
+                            await openAIService.suggestMeal(selectedWorkOut);
+                        if (suggestedMeal != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
                               content: Text(
-                                  'Failed to suggest a meal for ${workout['name']}')),
-                        );
-                      }
-                    },
-                    child: Text('Get Meal Suggestion'),
-                  ),
-                ),
+                                  'Pre-workout Meal for $selectedWorkOut: \n$suggestedMeal'),
+                              backgroundColor: Colors.green[700],
+                              duration: const Duration(seconds: 10),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  'Failed to suggest a meal for ${workout['name']}'),
+                              backgroundColor: Colors.red[
+                                  700], // Optional: Customize SnackBar color
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text('Pre-workout Meal'),
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.black,
+                        backgroundColor:
+                            Colors.white.withOpacity(0.5), // Text color
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        elevation: 0, // No shadow
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 15),
+                      ),
+                    )),
               ],
             ),
           );

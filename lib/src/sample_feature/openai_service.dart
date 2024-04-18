@@ -63,7 +63,7 @@ class OpenAIService {
     final systemMessage = OpenAIChatCompletionChoiceMessageModel(
       content: [
         OpenAIChatCompletionChoiceMessageContentItemModel.text(
-            "Suggest a meal for the workout: $workoutName"),
+            "Suggest a pre-workout meal for the workout: $workoutName"),
       ],
       role: OpenAIChatMessageRole.system,
     );
