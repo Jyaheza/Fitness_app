@@ -4,6 +4,7 @@ import 'package:final_project/src/sample_feature/chest_page.dart';
 import 'package:final_project/src/sample_feature/legs_workout.dart';
 import 'package:final_project/src/sample_feature/shoulders_page.dart';
 import 'package:flutter/material.dart';
+import 'openai_service.dart';
 import '../settings/settings_view.dart';
 
 class WorkoutListView extends StatelessWidget {
@@ -16,6 +17,8 @@ class WorkoutListView extends StatelessWidget {
     {'name': 'Arms', 'image': 'assets/images/arms.jpeg'},
     {'name': 'Shoulders', 'image': 'assets/images/shoulder.webp'},
   ];
+
+  final OpenAIService openAIService = OpenAIService();
 
   @override
   Widget build(BuildContext context) {
@@ -64,25 +67,71 @@ class WorkoutListView extends StatelessWidget {
                 );
               }
             },
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height / workoutData.length,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(workout['image']),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              child: Center(
-                child: Text(
-                  workout['name'],
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+            child: Stack(
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height:
+                      MediaQuery.of(context).size.height / workoutData.length,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage(workout['image']),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      workout['name'],
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                Positioned(
+                    bottom: 10,
+                    right: 10,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        String selectedWorkOut = workout['name'];
+                        String? suggestedMeal =
+                            await openAIService.suggestMeal(selectedWorkOut);
+                        if (suggestedMeal != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  'Pre-workout Meal for $selectedWorkOut: \n$suggestedMeal'),
+                              backgroundColor: Colors.green[700],
+                              duration: const Duration(seconds: 10),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  'Failed to suggest a meal for ${workout['name']}'),
+                              backgroundColor: Colors.red[
+                                  700], // Optional: Customize SnackBar color
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text('Pre-workout Meal'),
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.black,
+                        backgroundColor:
+                            Colors.white.withOpacity(0.5), // Text color
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        elevation: 0, // No shadow
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 15),
+                      ),
+                    )),
+              ],
             ),
           );
         },
