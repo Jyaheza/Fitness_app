@@ -1,16 +1,18 @@
+import 'package:final_project/src/sample_feature/arms_page.dart';
+import 'package:final_project/src/sample_feature/back_page.dart';
+import 'package:final_project/src/sample_feature/shoulders_page.dart';
 import 'package:flutter/material.dart';
-
 import '../settings/settings_view.dart';
 
 class WorkoutListView extends StatelessWidget {
   static const routeName = '/';
 
-  // Define a list of workout data
   final List<Map<String, dynamic>> workoutData = [
     {'name': 'Chest', 'image': 'assets/images/chest1.jpeg'},
-    {'name': 'Legs', 'image': 'assets/images/back.jpg'},
-    {'name': 'Back', 'image': 'assets/images/leg.webp'},
-    // Add more workout types with their respective images
+    {'name': 'Legs', 'image': 'assets/images/leg.webp'},
+    {'name': 'Back', 'image': 'assets/images/back.webp'},
+    {'name': 'Arms', 'image': 'assets/images/arms.jpeg'},
+    {'name': 'Shoulders', 'image': 'assets/images/shoulder.webp'},
   ];
 
   @override
@@ -22,7 +24,6 @@ class WorkoutListView extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              // Navigate to the settings page
               Navigator.pushNamed(context, SettingsView.routeName);
             },
           ),
@@ -31,12 +32,25 @@ class WorkoutListView extends StatelessWidget {
       body: ListView.builder(
         itemCount: workoutData.length,
         itemBuilder: (BuildContext context, int index) {
-          // Extract workout data
           final workout = workoutData[index];
           return InkWell(
             onTap: () {
-              // Handle tap on workout item
-              // You can navigate to a detail page or perform any other action
+              if (workout['name'] == 'Shoulders') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ShouldersPage()),
+                );
+              } else if (workout['name'] == 'Arms') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ArmsPage()),
+                );
+              } else if (workout['name'] == 'Back') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => BackPage()),
+                );
+              }
             },
             child: Container(
               width: MediaQuery.of(context).size.width,
