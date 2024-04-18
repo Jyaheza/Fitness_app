@@ -1,9 +1,6 @@
-import 'package:final_project/src/sample_feature/arms_page.dart';
-import 'package:final_project/src/sample_feature/back_page.dart';
-import 'package:final_project/src/sample_feature/chest_page.dart';
-import 'package:final_project/src/sample_feature/legs_workout.dart';
-import 'package:final_project/src/sample_feature/shoulders_page.dart';
+import 'package:final_project/src/sample_feature/meal_suggestion.dart';
 import 'package:flutter/material.dart';
+import 'openai_service.dart';
 import '../settings/settings_view.dart';
 
 class WorkoutListView extends StatelessWidget {
@@ -16,6 +13,8 @@ class WorkoutListView extends StatelessWidget {
     {'name': 'Arms', 'image': 'assets/images/arms.jpeg'},
     {'name': 'Shoulders', 'image': 'assets/images/shoulder.webp'},
   ];
+
+  final OpenAIService openAIService = OpenAIService();
 
   @override
   Widget build(BuildContext context) {
@@ -36,53 +35,76 @@ class WorkoutListView extends StatelessWidget {
         itemBuilder: (BuildContext context, int index) {
           final workout = workoutData[index];
           return InkWell(
-            onTap: () {
-              if (workout['name'] == 'Shoulders') {
+            onTap: () async {
+              // Pass workout name to OpenAIService
+              String? suggestedMeal =
+                  await openAIService.suggestMeal(workout['name']);
+              if (suggestedMeal != null) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ShouldersPage()),
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        MealSuggestionsPage(workoutName: workout['name']),
+                  ),
                 );
-              } else if (workout['name'] == 'Arms') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ArmsPage()),
-                );
-              } else if (workout['name'] == 'Back') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => BackPage()),
-                );
-              } else if (workout['name'] == 'Chest') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ChestPage()),
-                );
-              } else if (workout['name'] == 'Legs') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LegsPage()),
+              } else {
+                // Handle error or show a message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content: Text(
+                          'Failed to suggest a meal for ${workout['name']}')),
                 );
               }
             },
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height / workoutData.length,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(workout['image']),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              child: Center(
-                child: Text(
-                  workout['name'],
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+            child: Stack(
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height:
+                      MediaQuery.of(context).size.height / workoutData.length,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage(workout['image']),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      workout['name'],
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                Positioned(
+                  bottom: 10,
+                  right: 10,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      // Pass workout name to OpenAIService
+                      String? suggestedMeal =
+                          await openAIService.suggestMeal(workout['name']);
+                      if (suggestedMeal != null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text('Suggested meal: $suggestedMeal')),
+                        );
+                      } else {
+                        // Handle error or show a message
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text(
+                                  'Failed to suggest a meal for ${workout['name']}')),
+                        );
+                      }
+                    },
+                    child: Text('Get Meal Suggestion'),
+                  ),
+                ),
+              ],
             ),
           );
         },
