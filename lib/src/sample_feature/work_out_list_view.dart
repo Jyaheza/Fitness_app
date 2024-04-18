@@ -1,5 +1,7 @@
 import 'package:final_project/src/sample_feature/arms_page.dart';
 import 'package:final_project/src/sample_feature/back_page.dart';
+import 'package:final_project/src/sample_feature/chest_page.dart';
+import 'package:final_project/src/sample_feature/legs_workout.dart';
 import 'package:final_project/src/sample_feature/shoulders_page.dart';
 import 'package:flutter/material.dart';
 import '../settings/settings_view.dart';
@@ -49,6 +51,16 @@ class WorkoutListView extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => BackPage()),
+                );
+              } else if (workout['name'] == 'Chest') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ChestPage()),
+                );
+              } else if (workout['name'] == 'Legs') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LegsPage()),
                 );
               }
             },
